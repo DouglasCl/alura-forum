@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+
     stages {
         stage("Limpando a workspace") {
             steps {
@@ -8,34 +8,36 @@ pipeline {
                     deleteDir()
             }
        }
-       
+
        stage("Clonando projeto do github") {
            steps {
-               git credentialsId: 'github-ssh', url: "git@github.com:DouglasCl/alura-forum.git" 
+               git credentialsId: 'github-ssh', url: "git@github.com:DouglasCl/alura-forum.git"
            }
        }
-       
+
        stage('Rodar testes unitarios') {
            steps {
                sh "mvn clean test "
            }
        }
-       
+
        stage('Gerando artefato') {
            steps {
                sh "mvn clean package -DskipTests "
            }
        }
-       
+
        stage('Solicitando aprovacao') {
            steps {
-                
-                   slackSend(color: 'warning', message: "Para aprovar este deploy clique aqui: ${JOB_URL} - [Janela de 5 minutos]", channel: 'alefh-devops')
+               script {
+                   slackSend(color: 'warning', message: "Para aprovar este deploy clique aqui: ${JOB_URL} - [Janela de 5 minutos]", channel: 'devops-douglas')
                    timeout(time: 5, unit: 'MINUTES') {
                    input(id: "Deploy Decision", message: "Deseja aprovar o deploy?", ok: 'Deploy')
                }
             }
            }
        }
+
+       
     }
 }
