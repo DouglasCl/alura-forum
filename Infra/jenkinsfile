@@ -4,8 +4,11 @@ pipeline {
     stages {
         stage("Limpando a workspace") {
             steps {
+                  script {
                     sh 'pwd'
                     deleteDir()
+                    slackSend(color: 'warning', message: "Inicio de deploy: ${JOB_URL}", channel: 'devops-douglas')
+                  }
             }
        }
 
@@ -23,20 +26,14 @@ pipeline {
 
        stage('Gerando artefato') {
            steps {
+               script {
                sh "mvn clean package -DskipTests "
+               slackSend(color: 'warning', message: "Fim de deploy ${JOB_URL}", channel: 'devops-douglas')
+               }
            }
        }
 
-       stage('Solicitando aprovacao') {
-           steps {
-               script {
-                   slackSend(color: 'warning', message: "Para aprovar este deploy clique aqui: ${JOB_URL} - [Janela de 5 minutos]", channel: 'devops-douglas')
-                   timeout(time: 5, unit: 'MINUTES') {
-                   input(id: "Deploy Decision", message: "Deseja aprovar o deploy?", ok: 'Deploy')
-               }
-            }
-           }
-       }
+       
 
        
     }
