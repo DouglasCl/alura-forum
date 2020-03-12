@@ -29,7 +29,7 @@ pipeline {
        
        stage('Solicitando aprovacao') {
            steps {
-                {
+                
                    slackSend(color: 'warning', message: "Para aprovar este deploy clique aqui: ${JOB_URL} - [Janela de 5 minutos]", channel: 'alefh-devops')
                    timeout(time: 5, unit: 'MINUTES') {
                    input(id: "Deploy Decision", message: "Deseja aprovar o deploy?", ok: 'Deploy')
